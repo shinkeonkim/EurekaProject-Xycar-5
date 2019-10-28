@@ -1,4 +1,5 @@
-# import part
+#!/usr/bin/python
+
 import rospy, time
 from std_msgs.msg import Int32MultiArray
 
