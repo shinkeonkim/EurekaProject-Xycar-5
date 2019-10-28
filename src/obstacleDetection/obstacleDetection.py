@@ -39,7 +39,7 @@ def ema(avg, vals):
     if len(avg) == 0:
         avg.append(vals[-1])
     weight = 0.9
-    avg[0] = avg[0] * (1.0 - weight) + vals[-1] * weight
+    avg[0] = avg[0] * weight + vals[-1] * (1.0 - weight)
     return avg[0]
     
 # median
