@@ -30,6 +30,22 @@ def callback(data):
     global usonic_data
     usonic_data = data.data
 
+# sliding window moving average
+def swma(vals):
+    return sum(vals) / len(vals)
+
+# exponential moving average
+def ema(avg, vals):
+    if len(avg) == 0:
+        avg.append(vals[-1])
+    weight = 0.9
+    avg[0] = avg[0] * (1.0 - weight) + vals[-1] * weight
+    return avg[0]
+    
+# median
+def med(vals):
+    return sorted(vals)[len(vals) // 2]
+	
 # main
 if __name__ == '__main__':
     init_node()
@@ -40,6 +56,9 @@ if __name__ == '__main__':
     
     front = []
     back = []
+    
+    #front_ema = []
+    #back_ema = []
 
     while not rospy.is_shutdown():
         
@@ -49,12 +68,11 @@ if __name__ == '__main__':
             back.pop(0)
         front.append(usonic_data[1])
         back.append(usonic_data[4])
-        
-        front_value = sum(front) / len(front)
-        back_value = sum(back) / len(back)
-        
+	
         if forward:
-            if front_value <= 40:
+            #if ema(front_ema, front) <= 40:
+            #if med(front) <= 40:
+            if swma(front) <= 40:
                 drive(90,90)
                 time.sleep(5)
                 for stop_cnt in range(2):
@@ -66,7 +84,9 @@ if __name__ == '__main__':
             else:
                 drive(90, 110)
         else:
-            if back_value <= 40:
+            #if ema(back_ema, back) <= 40:
+            #if med(back) <= 40:
+            if swma(back) <= 40:
                 drive(90,90)
                 time.sleep(5)
                 for stop_cnt in range(2):
