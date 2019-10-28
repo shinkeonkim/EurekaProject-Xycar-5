@@ -36,10 +36,30 @@ if __name__ == '__main__':
     time.sleep(3)
 
     rate = rospy.Rate(10)
+    forward = True
+
     while not rospy.is_shutdown():
-        if usonic_data[1] <= 60:
-            drive(90, 90)
+        if forward:
+	        if usonic_data[1] <= 60:
+	            for stop_cnt in range(2):
+                    drive(90, 90)
+                    time.sleep(0.1)
+                    drive(90, 60)
+                    time.sleep(0.1)
+                time.sleep(0.5)
+                forward = False
+	        else:
+	            drive(90, 120)
         else:
-            drive(90, 120)
+            if usonic_data[4] <= 60:
+	            for stop_cnt in range(2):
+                    drive(90, 90)
+                    time.sleep(0.1)
+                    drive(90, 120)
+                    time.sleep(0.1)
+                time.sleep(0.5)
+                forward = True
+	        else:
+	            drive(90, 60)
         rate.sleep()
     rospy.on_shutdown(exit_node)
