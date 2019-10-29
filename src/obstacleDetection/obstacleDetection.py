@@ -38,6 +38,13 @@ if __name__ == '__main__':
     rate = rospy.Rate(10)
     forward = True
     
+    forward_cnt = 0
+    forward_speed = [110,120,130]
+    forward_std_value = [40,40,40]
+
+    backward_speed = 70
+    back_std_value = 40
+
     front = []
     back = []
 
@@ -54,28 +61,31 @@ if __name__ == '__main__':
         back_value = sum(back) / len(back)
         
         if forward:
-            if front_value <= 40:
-                drive(90,90)
+            if front_value <= forward_std_value[forward_cnt]:
+                drive(90,90) # 정지 5초
                 time.sleep(5)
                 for stop_cnt in range(2):
                     drive(90, 90)
                     time.sleep(0.1)
-                    drive(90, 70)
+                    drive(90, backward_speed)
                     time.sleep(0.1)
-                forward = False
+                forward = False        
+                forward_speed_cnt+=1
+                forward_speed_cnt%=3
             else:
-                drive(90, 110)
+                drive(90, forward_speed[forward_cnt])
         else:
-            if back_value <= 40:
-                drive(90,90)
+            if back_value <= back_std_value:
+                drive(90,90) # 정지 5초
                 time.sleep(5)
                 for stop_cnt in range(2):
                     drive(90, 90)
                     time.sleep(0.1)
-                    drive(90, 110)
+                    drive(90, forward_speed[forward_cnt])
                     time.sleep(0.1)
                 forward = True
             else:
-	            drive(90, 70)
+	            drive(90, backward_speed)
         rate.sleep()
+
     rospy.on_shutdown(exit_node)
