@@ -30,6 +30,22 @@ def callback(data):
     global usonic_data
     usonic_data = data.data
 
+# sliding window moving average
+def swma(vals):
+    return sum(vals) / len(vals)
+
+# exponential moving average
+def ema(avg, vals):
+    if len(avg) == 0:
+        avg.append(vals[-1])
+    weight = 0.9
+    avg[0] = avg[0] * weight + vals[-1] * (1.0 - weight)
+    return avg[0]
+    
+# median
+def med(vals):
+    return sorted(vals)[len(vals) // 2]
+
 # main
 if __name__ == '__main__':
     init_node()
@@ -40,13 +56,16 @@ if __name__ == '__main__':
     
     forward_cnt = 0
     forward_speed = [110,120,130]
-    forward_std_value = [40,40,40]
+    forward_std_value = [40,50,60]
 
     backward_speed = 70
     back_std_value = 40
 
     front = []
     back = []
+
+    front_ema = []
+    back_ema = []
 
     while not rospy.is_shutdown():
         
@@ -61,8 +80,10 @@ if __name__ == '__main__':
         back_value = sum(back) / len(back)
         
         if forward:
-            if front_value <= forward_std_value[forward_cnt]:
-                drive(90,90) # 정지 5초
+            #if ema(front_ema, front) <= forward_std_value[forward_cnt]:
+            #if med(front) <= forward_std_value[forward_cnt]:
+            if swma(front) <= forward_std_value[forward_cnt]:
+                drive(90,90)
                 time.sleep(5)
                 for stop_cnt in range(2):
                     drive(90, 90)
@@ -70,13 +91,15 @@ if __name__ == '__main__':
                     drive(90, backward_speed)
                     time.sleep(0.1)
                 forward = False        
-                forward_speed_cnt+=1
-                forward_speed_cnt%=3
+                forward_cnt+=1
+                forward_cnt%=3
             else:
                 drive(90, forward_speed[forward_cnt])
         else:
-            if back_value <= back_std_value:
-                drive(90,90) # 정지 5초
+            #if ema(back_ema, back) <= back_std_value:
+            if med(back) <= back_std_value:
+            #if swma(back) <= back_std_value:
+                drive(90,90)
                 time.sleep(5)
                 for stop_cnt in range(2):
                     drive(90, 90)
