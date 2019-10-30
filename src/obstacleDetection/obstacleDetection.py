@@ -38,6 +38,12 @@ def callback(data):
     # front, back is nonzero, take a data.
     if data.data[1] != 0 and data.data[4] != 0 :
         usonic_data = data.data
+        
+	if len(front) > 4:
+            front.pop(0)
+        if len(back) > 4:
+            back.pop(0)
+
         front.append(usonic_data[1])
         back.append(usonic_data[4])
     
@@ -82,14 +88,6 @@ if __name__ == '__main__':
     ''''
 
     while not rospy.is_shutdown():
-        if len(front) > 4:
-            front.pop(0)
-        if len(back) > 4:
-            back.pop(0)
-
-        #front.append(usonic_data[1])
-        #back.append(usonic_data[4])
-
         if forward:
             #if ema(front_ema, front) <= forward_std_value[forward_cnt]:
             if med(front) <= forward_std_value[forward_cnt]:
