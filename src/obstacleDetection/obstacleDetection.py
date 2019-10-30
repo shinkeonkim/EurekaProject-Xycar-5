@@ -38,6 +38,8 @@ def callback(data):
     # front, back is nonzero, take a data.
     if data.data[1] != 0 and data.data[4] != 0 :
         usonic_data = data.data
+        front.append(usonic_data[1])
+        back.append(usonic_data[4])
     
 # sliding window moving average
 def swma(vals):
@@ -61,7 +63,7 @@ if __name__ == '__main__':
     time.sleep(3)
 
     
-    rate = rospy.Rate(10)
+    rate = rospy.Rate(100)
     forward = True
     
     forward_cnt = 0
@@ -72,10 +74,12 @@ if __name__ == '__main__':
     back_std_value = 43
 
     # add usonic_data before forward
+    '''
     for i in range(5):
         front.append(usonic_data[1])
         back.append(usonic_data[4])
         rate.sleep()
+    ''''
 
     while not rospy.is_shutdown():
         if len(front) > 4:
@@ -83,8 +87,8 @@ if __name__ == '__main__':
         if len(back) > 4:
             back.pop(0)
 
-        front.append(usonic_data[1])
-        back.append(usonic_data[4])
+        #front.append(usonic_data[1])
+        #back.append(usonic_data[4])
 
         if forward:
             #if ema(front_ema, front) <= forward_std_value[forward_cnt]:
@@ -116,7 +120,7 @@ if __name__ == '__main__':
                     time.sleep(0.1)
                 forward = True
             else:
-	            drive(90, backward_speed)
+	        drive(90, backward_speed)
         rate.sleep()
 
     rospy.on_shutdown(exit_node)
