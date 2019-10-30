@@ -35,7 +35,9 @@ def drive(angle, speed):
 def callback(data):
     global usonic_data
 
-    usonic_data = data.data
+    # front, back is nonzero, take a data.
+    if data.data[1] != 0 and data.data[4] != 0 :
+        usonic_data = data.data
     
 # sliding window moving average
 def swma(vals):
@@ -89,6 +91,7 @@ if __name__ == '__main__':
             if med(front) <= forward_std_value[forward_cnt]:
             #if swma(front) <= forward_std_value[forward_cnt]:
                 drive(90,90)
+                print(usonic_data) # 경계가 40이하 일 때, 리스트 출력.
                 time.sleep(5)
                 for stop_cnt in range(2):
                     drive(90, 90)
