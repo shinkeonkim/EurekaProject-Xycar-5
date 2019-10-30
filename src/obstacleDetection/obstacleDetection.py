@@ -34,6 +34,8 @@ def drive(angle, speed):
 # callback
 def callback(data):
     global usonic_data
+    global front
+    global back
 
     # front, back is nonzero, take a data.
     if data.data[1] != 0 and data.data[4] != 0 :
