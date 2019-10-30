@@ -81,6 +81,9 @@ if __name__ == '__main__':
         if len(back) > 4:
             back.pop(0)
 
+        front.append(usonic_data[1])
+        back.append(usonic_data[4])
+
         if forward:
             #if ema(front_ema, front) <= forward_std_value[forward_cnt]:
             if med(front) <= forward_std_value[forward_cnt]:
