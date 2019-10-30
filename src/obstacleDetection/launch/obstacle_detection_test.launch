@@ -1,6 +1,5 @@
 <launch>
     <node pkg="ultrasonic" type="ultra_sonic_publish.py" name="ultra_sonic_pub"/>
     <node pkg="xycar_b2" type="xycar_b2_motor.py" name="xycar_b2_motor"/>
-    <node pkg="obstacleDetection" type="obstacleDetection.py" name="obstacleDetection"/>
+    <node pkg="obstacleDetection" type="obstacleDetection.py" name="obstacleDetection" output = "screen"/>
 </launch>
-
