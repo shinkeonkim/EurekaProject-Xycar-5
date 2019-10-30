@@ -75,11 +75,11 @@ if __name__ == '__main__':
     forward = True
     
     forward_cnt = 0
-    forward_speed = [110,117,123]
-    forward_std_value = [40,50,64]
+    forward_speed = [110,115,120]
+    forward_std_value = [48,65,85]
 
     backward_speed = 70
-    back_std_value = 43
+    back_std_value = 54
 
     # add usonic_data before forward
     '''
@@ -87,21 +87,21 @@ if __name__ == '__main__':
         front.append(usonic_data[1])
         back.append(usonic_data[4])
         rate.sleep()
-    ''''
+    '''
 
     while not rospy.is_shutdown():
+        print(front,back,usonic_data)
         if forward:
             #if ema(front_ema, front) <= forward_std_value[forward_cnt]:
             if med(front) <= forward_std_value[forward_cnt]:
             #if swma(front) <= forward_std_value[forward_cnt]:
-                drive(90,90)
-                print(usonic_data) # 경계가 40이하 일 때, 리스트 출력.
-                time.sleep(5)
                 for stop_cnt in range(2):
                     drive(90, 90)
                     time.sleep(0.1)
                     drive(90, backward_speed)
                     time.sleep(0.1)
+                drive(90,90)
+                time.sleep(5)
                 forward = False        
                 forward_cnt+=1
                 forward_cnt%=3
@@ -111,13 +111,13 @@ if __name__ == '__main__':
             #if ema(back_ema, back) <= back_std_value:
             if med(back) <= back_std_value:
             #if swma(back) <= back_std_value:
-                drive(90,90)
-                time.sleep(5)
                 for stop_cnt in range(2):
                     drive(90, 90)
                     time.sleep(0.1)
-                    drive(90, forward_speed[forward_cnt])
+                    drive(90, 110)
                     time.sleep(0.1)
+                drive(90,90)
+                time.sleep(5)
                 forward = True
             else:
 	        drive(90, backward_speed)
