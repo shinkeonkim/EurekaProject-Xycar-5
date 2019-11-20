@@ -1,0 +1,15 @@
+<launch>
+    <node name="usb_cam" pkg="usb_cam" type="usb_cam_node" output="screen">
+        <param name="video_device" value="/dev/v4l/by-id/usb-HD_Camera_Manufacturer_USB_2.0_Camera-video-index0" />
+        <param name="autoexposure" value="false"/>
+        <param name="exposure" value="150"/>
+        <param name="image_width" value="640" />
+        <param name="image_height" value="480" />
+        <param name="pixel_format" value="yuyv" />
+        <param name="camera_frame_id" value="usb_cam" />
+        <param name="io_method" value="mmap"/>
+    </node>
+    <node name="ultrasonic" pkg="ultrasonic" type="ultra_sonic_publish.py" />
+    <node name="motor_control" pkg="xycar_b2" type="xycar_b2_motor.py" />
+    <node name="autodrive" pkg="auto_drive" type="autodrive.py" output="screen" />
+</launch>

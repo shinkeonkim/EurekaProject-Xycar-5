@@ -1,0 +1,6 @@
+<launch>
+    <node name="tracktest" pkg="auto_drive" type="testtrack.py" />
+    <node name="ultrasonic" pkg="ultrasonic" type="ultra_sonic_publish.py" />
+    <node name="motor_control" pkg="xycar_b2" type="xycar_b2_motor.py" />
+    <node name="autodrive" pkg="auto_drive" type="autodrive.py" output="screen" />
+</launch>
