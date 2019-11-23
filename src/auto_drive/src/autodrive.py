@@ -51,6 +51,7 @@ class AutoDrive:
         elif -4 <= theta <= 4:
             K = 2.5
         elif -15 <= theta <= 15:
+            '''
             if theta < 0:
                 if theta > -10:
                     K = 1.86
@@ -58,12 +59,21 @@ class AutoDrive:
                     K = 1.4
             else:
                 K = 1.75
+            '''
+            K = 1.9
+        else:
+            if theta > 0:
+                K = 2.0
+            else:
+                K = 1.95
+        '''
         elif theta >= 20:
             K = 3.0
         elif theta <= -20:
             K = 2.1
         else:
-            K = 1.5	
+            K = 1.5
+        '''	
         """
         if theta > 0:
             K = 1.75
@@ -76,9 +86,9 @@ class AutoDrive:
         #return angle
 
     def accelerate(self, angle, theta, left, right):
-        K = 130
+        K = 140
 
-        speed = K - min(abs(theta)/2, 15) 
+        speed = K - min(abs(theta)/2, 10) 
 
         return speed
 
