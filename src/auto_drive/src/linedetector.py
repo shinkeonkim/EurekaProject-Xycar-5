@@ -20,7 +20,7 @@ class LineDetector:
         self.bridge = CvBridge()
         rospy.Subscriber(topic, Image, self.conv_image)
         self.before = np.array([[0, 315], [639, 305], [170, 260], [460, 250]], dtype='float32')
-        self.after = np.array([[0, 200], [100, 200], [0, 0], [100, 0]], dtype='float32')
+        self.after = np.array([[0, 100], [100, 100], [0, -100], [100, -100]], dtype='float32')
         self.theta = 0.0
 
     def conv_image(self, data):
@@ -45,14 +45,13 @@ class LineDetector:
     def detect_lines(self):
         #self.theta = 0.0
         frame = self.cam_img
-        tdSize = (100, 310)
+        tdSize = (100, 210)
         m = cv2.getPerspectiveTransform(self.before, self.after)
         topdown = cv2.warpPerspective(frame, m, tdSize)
 
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        _, mask = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY)
         gray = cv2.GaussianBlur(gray, (7, 7), 0)
-        edges = cv2.bitwise_and(gray, cv2.Canny(gray, 50, 150, apertureSize=3))
+        edges = cv2.Canny(gray, 50, 150, apertureSize=3)
         edges = cv2.warpPerspective(edges, m, tdSize)
         lines = cv2.HoughLines(edges, 1, np.pi / 180, 80)
         
@@ -114,8 +113,8 @@ class LineDetector:
                     cnts[index] = 0
                 theta = sum(thetas) / len(thetas)
 
-                weight = 0.2
-                self.theta = self.theta * (1.0 - weight) + theta * weight
+                #weight = 0.2
+                self.theta = theta #self.theta * (1.0 - weight) + theta * weight
 
                 pts = []
                 half = len(ptCnts) // 2
@@ -138,6 +137,8 @@ class LineDetector:
 
                 cv2.line(topdown, (x1, y1), (x2, y2), (0, 255, 0), 5)
                 '''
+        else:
+            self.theta *= 0.8
         '''
         cv2.imshow("origin", frame)
         cv2.imshow('hough', topdown)
