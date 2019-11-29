@@ -22,7 +22,7 @@ class AutoDrive:
         speed = self.accelerate(angle,line_theta,left,right)
         #print(line_theta,angle,speed)
         print(line_theta, left, right)
-        self.driver.drive(angle + 90 + 1.8, speed)
+        self.driver.drive(angle + 91.8, speed)
 
     def steer(self, theta, left, right):
         """
@@ -45,6 +45,7 @@ class AutoDrive:
             elif diff > 0:
                 weight = 1.0
         """
+        theta += 0.4
         K = 0.0
         if -0.8 <= theta <= 0.8:
             K = 8.0
@@ -60,12 +61,15 @@ class AutoDrive:
             else:
                 K = 1.75
             '''
-            K = 1.9
-        else:
-            if theta > 0:
+            if theta < 0:
                 K = 2.0
             else:
-                K = 1.95
+                K = 1.9
+        else:
+            if theta < 0:
+                K = 2.0
+            else:
+                K = 2.0
         '''
         elif theta >= 20:
             K = 3.0
@@ -88,7 +92,7 @@ class AutoDrive:
     def accelerate(self, angle, theta, left, right):
         K = 140
 
-        speed = K - min(abs(theta)/2, 10) 
+        speed = K# - min(abs(theta)/2, 10) 
 
         return speed
 
