@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import rospy
 import cv2
 import numpy as np
@@ -10,7 +12,7 @@ class LineDetector:
     def __init__(self, topic):
         # Initialize various class-defined attributes, and then...
         self.cam_img = np.zeros(shape=(480, 640, 3), dtype=np.uint8)
-        #self.vid_out = cv2.VideoWriter('~/xycar/src/auto_drive/src/output.avi', -1, 20.0, (640, 48))
+        self.vid_out = cv2.VideoWriter('/home/nvidia/output.avi', cv2.VideoWriter_fourcc(*'MJPG'), 30, (640, 480))
         '''
         self.mask = np.zeros(shape=(self.scan_height, self.image_width),
                              dtype=np.uint8)
@@ -23,9 +25,12 @@ class LineDetector:
         self.after = np.array([[0, 100], [100, 100], [0, -100], [100, -100]], dtype='float32')
         self.theta = 0.0
 
+    def __del__(self):
+        self.vid_out.release()
+
     def conv_image(self, data):
         self.cam_img = self.bridge.imgmsg_to_cv2(data, 'bgr8')
-        #self.vid_out.write(self.cam_img)
+        self.vid_out.write(self.cam_img)
         '''
         v = self.roi_vertical_pos
         roi = self.cam_img[v:v + self.scan_height, :]
@@ -50,7 +55,7 @@ class LineDetector:
         topdown = cv2.warpPerspective(frame, m, tdSize)
 
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        gray = cv2.GaussianBlur(gray, (7, 7), 0)
+        gray = cv2.GaussianBlur(gray, (3, 3), 0)
         edges = cv2.Canny(gray, 50, 150, apertureSize=3)
         edges = cv2.warpPerspective(edges, m, tdSize)
         lines = cv2.HoughLines(edges, 1, np.pi / 180, 80)
@@ -138,7 +143,7 @@ class LineDetector:
                 cv2.line(topdown, (x1, y1), (x2, y2), (0, 255, 0), 5)
                 '''
         else:
-            self.theta *= 0.8
+            self.theta *= 0.915
         '''
         cv2.imshow("origin", frame)
         cv2.imshow('hough', topdown)
