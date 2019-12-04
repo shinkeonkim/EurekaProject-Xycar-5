@@ -55,4 +55,15 @@ class TrafficLightDetector:
                 if rog[i][0][i] > rog[M][0][M]:
                     M = i
 
-            return ['red', 'orange', 'green'][M]
+            cv2.imshow('hsv', hsv)
+
+            cv2.imshow('result', rog[M][1])
+            print(['red', 'orange', 'green'][M])
+
+            image = cv2.copyTo(image, mask)
+            #return ['red', 'orange', 'green'][M]
+
+        cv2.imshow('image', image)
+        cv2.waitKey(0)
+
+        return None

@@ -7,12 +7,14 @@ import time
 from linedetector import LineDetector
 from obstacledetector import ObstacleDetector
 from motordriver import MotorDriver
+from TrafficLightDetector import TrafficLightDetector
 
 class AutoDrive:
 
     def __init__(self):
         rospy.init_node('xycar_driver')
         self.line_detector = LineDetector('/usb_cam/image_raw')
+        self.traffic_light_detector = TrafficLightDetector('/usb_cam/image_raw')
         self.obstacle_detector = ObstacleDetector('/ultrasonic')
         self.driver = MotorDriver('/xycar_motor_msg')
         self.slow_time = time.time()
@@ -28,6 +30,8 @@ class AutoDrive:
         return sum(L) / len(L)
 
     def trace(self):
+        self.traffic_light_detector.detect()
+        return
         obs_l, obs_m, obs_r = self.obstacle_detector.get_distance()
         line_theta,left,right = self.line_detector.detect_lines()
         line_theta += 0.4
