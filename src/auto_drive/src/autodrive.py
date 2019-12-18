@@ -21,6 +21,8 @@ class AutoDrive:
         self.prev_m = []
         self.prev_r = []
         self.MAX_SIZE = 3
+        self.isstop = False
+        self.isstart = False
 
     def average(self, L):
         if len(L) == 0:
@@ -46,39 +48,47 @@ class AutoDrive:
             if len(self.prev_l) + 1 >= self.MAX_SIZE:
                 self.prev_l.pop(0)
             self.prev_l.append(obs_l)
-            if obs_l <= 70:
+            if obs_l <= 90:
                 cnt +=1
             s += obs_l
         if obs_m != 0:
             if len(self.prev_m) + 1 >= self.MAX_SIZE:
                 self.prev_m.pop(0)
             self.prev_m.append(obs_m)
-            if obs_m <= 70:
+            if obs_m <= 90:
                 cnt +=2
             s += obs_m
         if obs_r != 0:
             if len(self.prev_r) + 1 >= self.MAX_SIZE:
                 self.prev_r.pop(0)
             self.prev_r.append(obs_r)
-            if obs_r <=70:
+            if obs_r <=90:
                 cnt +=1
             s += obs_r
         if cnt >=2:
             dis = s/cnt
 
-        if ((cnt >=3) or (obs_m != 0 and obs_m <=70 and self.average(self.prev_m) <= 75)) or (self.average(self.prev_l) <= 75 and self.average(self.prev_m) <= 75 and self.average(self.prev_r) <=75):
-            for i in range(2):
+        if -1 <= line_theta <= 1 and cnt >=3 and self.isstart:
+            if self.isstop:
                 self.driver.drive(90,90)
-                time.sleep(0.1)
-                self.driver.drive(90,60)
-                time.sleep(0.1)
-            self.driver.drive(90,90)
-            time.sleep(5)
+            else:
+                self.isstop = True
+                for i in range(2):
+                    self.driver.drive(90,90)
+                    time.sleep(0.1)
+                    self.driver.drive(90,50)
+                    time.sleep(0.1)
+                self.driver.drive(90,90)
+                #time.sleep(3)
+                rospy.signal_shutdown('Quit')
         else:
+            self.isstop = False
             self.driver.drive(angle + 90+ 2.77, speed)
 
         if cnt >=2:
             self.prev_dis = dis
+        if line_theta > 10:
+            self.isstart = True
 
     def steer(self, theta, left, right):
         """
@@ -119,7 +129,7 @@ class AutoDrive:
                 K = 1.75
             '''
             if theta < 0:
-                K = 1.5
+                K = 2.0
             else:
                 K = 2.0
         else: #elif abs(theta) < 30:
@@ -149,14 +159,14 @@ class AutoDrive:
         #return angle
 
     def accelerate(self, angle, theta, left, right):
-        K = 135
-        
+        K = 140
+        """
         if abs(theta) > 4:
             self.slow_time = time.time() + 2
 
         if time.time() < self.slow_time:
             K = 130
-        
+        """
         speed = K# - min(abs(theta)/2, 10) 
 
         return speed
@@ -172,3 +182,4 @@ if __name__ == '__main__':
         car.trace()
         rate.sleep()
     rospy.on_shutdown(car.exit)
+
