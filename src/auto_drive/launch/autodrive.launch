@@ -2,7 +2,7 @@
     <node name="usb_cam" pkg="usb_cam" type="usb_cam_node" output="screen">
         <param name="video_device" value="/dev/v4l/by-id/usb-HD_Camera_Manufacturer_USB_2.0_Camera-video-index0" />
         <param name="autoexposure" value="false"/>
-        <param name="exposure" value="150"/>
+        <param name="exposure" value="100"/>
         <param name="image_width" value="640" />
         <param name="image_height" value="480" />
         <param name="pixel_format" value="yuyv" />
