@@ -12,3 +12,4 @@ class MotorDriver:
         drive_info = [angle, speed]
         pub_info = Int32MultiArray(data=drive_info)
         self.motor_pub.publish(pub_info)
+

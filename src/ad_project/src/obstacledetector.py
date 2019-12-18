@@ -16,3 +16,4 @@ class ObstacleDetector:
 
     def get_distance(self):
         return self.left, self.mid, self.right
+

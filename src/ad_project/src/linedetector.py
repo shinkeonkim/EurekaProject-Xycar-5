@@ -177,3 +177,4 @@ class LineDetector:
         # Display images for debugging purposes;
         # do not forget to call cv2.waitKey().
         pass
+

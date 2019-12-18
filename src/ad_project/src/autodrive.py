@@ -8,6 +8,8 @@ from linedetector import LineDetector
 from obstacledetector import ObstacleDetector
 from motordriver import MotorDriver
 from TrafficLightDetector import TrafficLightDetector
+from VehicleBreakerDetector import VehicleBreakerDetector
+from BusStopDetector import BusStopDetector
 
 class AutoDrive:
 
@@ -15,6 +17,8 @@ class AutoDrive:
         rospy.init_node('xycar_driver')
         self.line_detector = LineDetector('/usb_cam/image_raw')
         self.traffic_light_detector = TrafficLightDetector('/usb_cam/image_raw')
+        self.vehicle_breaker_detector = VehicleBreakerDetector('/usb_cam/image_raw')
+        self.bus_stop_detector = BusStopDetector('/usb_cam/image_raw')
         self.obstacle_detector = ObstacleDetector('/ultrasonic')
         self.driver = MotorDriver('/xycar_motor_msg')
         self.slow_time = time.time()
@@ -23,6 +27,9 @@ class AutoDrive:
         self.prev_m = []
         self.prev_r = []
         self.MAX_SIZE = 3
+        self.bus_stop_time = time.time()
+        self.bus_ignore_time = -1
+        self.bus_data = []
 
     def average(self, L):
         if len(L) == 0:
@@ -30,7 +37,67 @@ class AutoDrive:
         return sum(L) / len(L)
 
     def trace(self):
-        self.traffic_light_detector.detect()
+        k = 500
+        
+        if len(self.bus_data) > 4:
+            self.bus_data.pop(0)
+        self.bus_data.append((self.bus_stop_detector.detect()))
+        bus_stop, stop_m, stop_M, people_cnt = 0, [0, 0], [0, 0], 0 #self.bus_data[-1]
+        for data in self.bus_data:
+            bus_stop += 1 if data[0] else 0
+            stop_m[0] += data[1][0][0]
+            stop_m[1] += data[1][0][1]
+            stop_M[0] += data[1][1][0]
+            stop_M[1] += data[1][1][1]
+            people_cnt += data[2]
+        bus_stop = bus_stop > len(self.bus_data) // 2
+        stop_m[0] //= len(self.bus_data)
+        stop_m[1] //= len(self.bus_data)
+        stop_M[0] //= len(self.bus_data)
+        stop_M[1] //= len(self.bus_data)
+        people_cnt /= len(self.bus_data)
+        '''
+        if bus_stop and (stop_M[0] - stop_m[0]) * (stop_M[1] - stop_m[1]) > (208 - 164) * (100 - 56):
+            time.sleep(3.0)
+            self.driver.drive(90, 90)
+            time.sleep(people_cnt * 2.0)
+        '''
+        
+        if bus_stop and (stop_M[0] - stop_m[0]) * (stop_M[1] - stop_m[1]) > (208 - 164) * (100 - 56):
+            if self.bus_stop_time < time.time():
+                #time.sleep(2.0)
+                #self.bus_stop_time = time.time() + 2.0
+                pass
+            if people_cnt > 0 and self.bus_ignore_time < time.time():
+                self.bus_stop_time = time.time() + 2.0
+            elif self.bus_stop_time > time.time():
+                pass #self.bus_ignore_time = time.time() + 5.0
+        
+        print(bus_stop, stop_m, stop_M, people_cnt)
+        if self.bus_stop_time > time.time() and self.bus_ignore_time < time.time():
+            self.driver.drive(90, 90)
+        else:
+            self.driver.drive(90, 115)
+        return
+
+        breaker_ret, cnt = self.vehicle_breaker_detector.detect()
+
+        print(cnt)
+        if breaker_ret:
+            self.driver.drive(90,90)
+        else:
+            self.driver.drive(90,115)
+        return
+        
+        light_color = self.traffic_light_detector.detect()
+        print(light_color)
+        if light_color == 'green':
+            self.driver.drive(90, 115)
+        elif light_color == 'orange':
+            self.driver.drive(90, 110)
+        elif light_color == 'red':
+            self.driver.drive(90, 90)
+
         return
         obs_l, obs_m, obs_r = self.obstacle_detector.get_distance()
         line_theta,left,right = self.line_detector.detect_lines()
@@ -176,3 +243,4 @@ if __name__ == '__main__':
         car.trace()
         rate.sleep()
     rospy.on_shutdown(car.exit)
+
