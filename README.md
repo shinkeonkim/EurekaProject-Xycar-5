@@ -16,11 +16,11 @@
 
 ||학번 |이름|github username|
 |--|--|--|--|
-|조장|20191564|김신건|shinkeonkim|
-|조원|20191550|곽다윗|dawit0905|
-|조원|20191549|고현성|cokwa|
-|조원|20191545|강경수|gomtang3274|
-|조원|20191565|김예리|yeringii|
+|조장|20191564|김신건|<a href = "https://github.com/shinkeonkim">shinkeonkim</a>|
+|조원|20191550|곽다윗|<a href = "https://github.com/dawit0905">dawit0905</a>|
+|조원|20191549|고현성|<a href = "https://github.com/cokwa">cokwa</a>|
+|조원|20191545|강경수|<a href = "https://github.com/gomtang3274">gomtang3274</a>|
+|조원|20191565|김예리|<a href = "https://github.com/yeringii">yeringii</a>|
 
 ## Video :tv:
 
